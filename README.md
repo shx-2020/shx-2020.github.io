@@ -1,239 +1,158 @@
-# 欢迎来到我的Github页面。
+<p align="center" class="mb-2">
+<img class="not-gallery-item" height="48" src="https://ppoffice.github.io/hexo-theme-icarus/img/logo.svg">
+<br> A simple, delicate, and modern theme for the static site generator Hexo.
+<br>
+<a href="https://ppoffice.github.io/hexo-theme-icarus/">Preview</a> |
+<a href="https://ppoffice.github.io/hexo-theme-icarus/categories/">Documentation</a> |
+<a href="https://gitter.im/hexo-theme-icarus/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge">Chat on Gitter</a>
+<br>
+</p>
 
-本页面可能将会用于发布我的项目:)
+![](https://ppoffice.github.io/hexo-theme-icarus/gallery/preview.png?1 "Icarus Preview")
 
-##  测试内容
-摘抄一段代码上去算了。
-```markdown
-package com.example.posttest;
+## :cd: Installation
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.annotation.SuppressLint;
-import android.content.Intent;
-import android.graphics.Color;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.os.Parcelable;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.method.LinkMovementMethod;
-import android.text.style.ClickableSpan;
-import android.text.style.ForegroundColorSpan;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.URL;
-import java.util.HashMap;
-
-import javax.net.ssl.HttpsURLConnection;
-
-public class MainActivity extends AppCompatActivity {
-    //=====================
-    private TextView tvNoAccount;
-    private EditText usernameEt;
-    private EditText passwordEt;
-    private Intent intent = new Intent();
-    private final SpannableStringBuilder style = new SpannableStringBuilder();
-    private MHandler mHandler = new MHandler();
-    private Message message = new Message();
-    private String jsonData = new String();
-    private JSONObject jsonObject = new JSONObject();
-
-    //==========重写函数==========
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        bindEditTexts();
-        setRegPageEntrance();
-        listenToButton();
-    }
-
-    //==========自定义函数============
-
-    private void bindEditTexts(){
-        usernameEt = findViewById(R.id.editText2);
-        passwordEt = findViewById(R.id.editText3);
-        passwordEt.setInputType(129);
-    }
-    //注册页面入口方法
-    private void setRegPageEntrance(){
-                style.append("没有账号？立刻注册！");
-        tvNoAccount = findViewById(R.id.textView);
-        ClickableSpan clickableSpan = new ClickableSpan() {
-            @Override
-            public void onClick(@NonNull View widget) {
-                intent = new Intent(MainActivity.this,
-                        RegisterActivity.class);
-                startActivity(intent);
-            }
-        };
-        style.setSpan(clickableSpan, 5, 10, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        tvNoAccount.setText(style);
-        ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(Color.parseColor("#0000FF"));
-        style.setSpan(foregroundColorSpan, 5, 10, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        tvNoAccount.setMovementMethod(LinkMovementMethod.getInstance());
-    }
-    //监听按钮方法
-    private void listenToButton(){
-        Button buttonToLogIn = findViewById(R.id.login_button);
-        buttonToLogIn.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v) {
-                HashMap<String,String> mMap = new HashMap<>();
-
-                mMap.put("username",usernameEt.getText().toString());
-                mMap.put("password",passwordEt.getText().toString());
-
-                loginRequest("https://www.wanandroid.com/user/login",mMap);
-            }
-        });
-    }
-
-    //请求登录方法
-    private void loginRequest(String mUrl, HashMap<String, String> params){
-        new Thread(
-                ()->{
-                    try{
-                        Message messageChildThread = new Message();
-                        URL url = new URL(mUrl);
-                        HttpsURLConnection connection = (HttpsURLConnection)url.openConnection();
-                        connection.setRequestMethod("POST");
-                        connection.setConnectTimeout(8000);
-                        connection.setReadTimeout(8000);
-                        connection.setDoInput(true);
-                        connection.setDoOutput(true);
-                        StringBuilder dataToWrite = new StringBuilder();
-                        for (String key : params.keySet()) {
-                            dataToWrite.append(key).append("=").append(params.get(key)).append("&");
-                        }
-                        connection.connect();
-                        OutputStream outputStream = connection.getOutputStream();
-                        outputStream.write(dataToWrite.substring(0,dataToWrite.length()-1).getBytes());
-                        InputStream in = connection.getInputStream();
-
-                        String responseData = streamToString(in);
-                        messageChildThread.obj = responseData;
-                        mHandler.sendMessage(messageChildThread);
-                    }catch(Exception e){
-                        e.printStackTrace();
-                    }
-                }
-        ).start();
-    }
-
-    //将stream转化为string的方法
-    String streamToString(InputStream in){
-        StringBuilder sb = new StringBuilder();
-        String oneLine;
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        try {
-            while((oneLine = reader.readLine())!=null){
-                sb.append(oneLine).append('\n');
-            }
-
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        finally {
-            try{
-                in.close();
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-
-        }
-        return sb.toString();
-    }
-
-    //查看登陆失败状态
-    private int logErrCode(){
-        int judgement;
-        try {
-            judgement = jsonObject.getInt("errorCode");
-        } catch (JSONException e) {
-            judgement = -999;
-            e.printStackTrace();
-        }
-        return judgement;
-    }
-
-    //查看登陆失败信息
-    private String logErrMsg(){
-        String msg ;
-        try{
-            msg = jsonObject.getString("errorMsg");
-        } catch (Exception e) {
-            msg = "Unknown error";
-            e.printStackTrace();
-        }
-        return msg;
-    }
-
-    private void showLoginState(){
-
-    }
-
-    //请求完成并得到数据之后的方法
-    private void doAfterRequestComplete(){
-        int errCode = logErrCode();
-        String errMsg = logErrMsg();
-
-        if(errCode != 0){
-            Toast.makeText(this,"登陆失败\n错误码："+errCode+"\n错误信息："+errMsg,Toast.LENGTH_LONG).show();
-            return;
-        }
-        else{
-            Toast.makeText(this,"登陆成功！",Toast.LENGTH_SHORT).show();
-            intent = new Intent(MainActivity.this,LoggedInActivity.class);
-            intent.putExtra("jsonData",jsonData);
-            startActivity(intent);
-        }
-    }
-
-    //==========内部类===========
-
-    @SuppressLint("HandlerLeak")
-    private class MHandler extends Handler {
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-
-            jsonData = (String)msg.obj;
-            try{
-                message = msg;
-                jsonData = (String) message.obj;
-                jsonObject = new JSONObject(jsonData);
-                doAfterRequestComplete();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-}
+```shell
+$ npm install hexo-theme-icarus
+$ hexo config theme icarus
 ```
 
-###  如何联系？
+Please refer to [Getting Started with Icarus](https://ppoffice.github.io/hexo-theme-icarus/uncategorized/getting-started-with-icarus/) 
+for more details.
 
-邮箱：shuhuanx@yeah.net
+## :gift: Features
 
-### 关于本页
-本页内发布原创内容版权（如果有）均为本人所属，任何人在未经许可的情况下擅自使用将有可能承担法律责任。
-本页的域名https://imaginarycrisis.xyz/ 以及 https://www.imaginarycrisis.xyz/ 均为本人所有。
+### Cyberpunk Theme Variant
+
+Tap into the future cyber world with the newly added Cyberpunk theme variant.
+Inspired by [Cyberpunk 2077](https://www.cyberpunk.net).
+
+![Icarus Cyberpunk](https://ppoffice.github.io/hexo-theme-icarus/gallery/screenshots/cyberpunk.png "Icarus Cyberpunk")
+
+### Extensive Plugin Support
+
+Icarus includes plentiful search, comment, sharing and other plugins out of the box that makes your
+blog feature-rich and powerful.
+
+**[Comment](https://ppoffice.github.io/hexo-theme-icarus/categories/Plugins/Comment/)**
+
+Changyan &middot; Disqus &middot; DisqusJS &middot; Facebook &middot; Gitalk &middot; Gitment &middot;
+Isso &middot; LiveRe &middot; Utterance &middot; Valine
+
+**[Donate Button](https://ppoffice.github.io/hexo-theme-icarus/categories/Plugins/Donation/)**
+
+Afdian.net &middot; Alipay &middot; Buy me a coffee &middot; Patreon &middot; Paypal &middot; Wecat
+
+**[Search](https://ppoffice.github.io/hexo-theme-icarus/categories/Plugins/Search/)**
+
+Algolia &middot; Baidu &middot; Google CSE &middot; Insight
+
+**[Share](https://ppoffice.github.io/hexo-theme-icarus/categories/Plugins/Share/)**
+
+AddThis &middot; AddToAny &middot; Baidu Share &middot; Share.js &middot; ShareThis
+
+**[Widgets](https://ppoffice.github.io/hexo-theme-icarus/categories/Widgets/)**
+
+Google Adsense &middot; Archives &middot; Categories &middot; External Site Links &middot; 
+Recent Posts &middot; Google Feedburner &middot; Tags &middot; Table of Contents
+
+**[Analytics](https://ppoffice.github.io/hexo-theme-icarus/Plugins/Analytics/icarus-user-guide-web-analytics-plugins/)**
+
+Baidu Statistics &middot; Bing Webmaster &middot; BuSuanZi Web Counter &middot; CNZZ Statistics &middot;
+Google Analytics &middot; Hotjar &middot; StatCounter &middot; Twitter Conversion Tracking
+
+**[Other Plugins](https://ppoffice.github.io/hexo-theme-icarus/categories/Plugins/)**
+
+Cookie Consent &middot; LightGallery &middot; Justified Gallery &middot; KaTeX &middot; MathJax &middot;
+Oudated Browser &middot; Page Loading Animations
+
+### Colorful Code Highlight
+
+Icarus directly import stylesheets from the [highlight.js](https://highlightjs.org/) package and makes more than
+90 code highlight themes available to you.
+
+<table>
+    <tr>
+        <th>Atom One Light</th>
+        <th>Monokai</th>
+        <th>Kimbie Dark</th>
+    </tr>
+    <tr>
+        <td><img width="266" src="https://ppoffice.github.io/hexo-theme-icarus/gallery/code-highlight/atom-one-light.png?2"></td>
+        <td><img width="266" src="https://ppoffice.github.io/hexo-theme-icarus/gallery/code-highlight/monokai.png?2"></td>
+        <td><img width="266" src="https://ppoffice.github.io/hexo-theme-icarus/gallery/code-highlight/kimbie-dark.png?2"></td>
+    </tr>
+</table>
+
+### Flexible Theme Configuration
+
+Icarus allows you to configure your site on a per-page or per-layout basis.
+
+<div>
+<table>
+    <tr>
+        <th>_config.yml</th>
+        <th>post.md</th>
+        <th>_config.page.yml</th>
+    </tr>
+    <tr>
+        <td>
+<pre>widgets:
+  - type: profile
+    position: left
+  - type: recent_posts
+    position: right</pre>
+        </td>
+        <td>
+<pre>widgets:
+  - type: profile
+    position: left
+  - type: recent_posts
+    position: left</pre>
+        </td>
+        <td>
+<pre>widgets: null
+ 
+ 
+ 
+</pre>
+        </td>
+    </tr>
+    <tr>
+        <td><img width="266" src="https://ppoffice.github.io/hexo-theme-icarus/gallery/screenshots/default-config.png"></td>
+        <td><img width="266" src="https://ppoffice.github.io/hexo-theme-icarus/gallery/screenshots/post-config.png"></td>
+        <td><img width="266" src="https://ppoffice.github.io/hexo-theme-icarus/gallery/screenshots/layout-config.png"></td>
+    </tr>
+</table>
+</div>
+
+### Responsive Layout
+
+Give your audiences best viewing experience with Icarus's mobile-friendly responsive layout.
+
+![Responsive Layout](https://ppoffice.github.io/hexo-theme-icarus/gallery/responsive.png)
+
+## :hammer: Development
+
+This project is built with
+
+- [Hexo](https://hexo.io/)
+- [Inferno.js](https://infernojs.org/)
+- [Stylus](https://stylus-lang.com/)
+- [Bulma](https://bulma.io/)
+
+Please refer to the [documentation](https://ppoffice.github.io/hexo-theme-icarus/categories/) and 
+[contributing guide](https://github.com/ppoffice/hexo-theme-icarus/blob/master/CONTRIBUTING.md) for implementation details.
+
+## :tada: Contribute
+
+If you feel like to help us build a better Icarus, you can
+
+:black_nib: [Submit a tutorial](https://github.com/ppoffice/hexo-theme-icarus/new/site/source/_posts) |
+:earth_asia: [Add a translation](https://github.com/ppoffice/hexo-theme-icarus/tree/master/languages) |
+:triangular_flag_on_post: [Report a bug](https://github.com/ppoffice/hexo-theme-icarus/issues/new) |
+:electric_plug: [Suggest a new feature](https://github.com/ppoffice/hexo-theme-icarus/pulls)
+
+## :memo: License
+
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/ppoffice/hexo-theme-icarus/blob/master/LICENSE) file for details.
