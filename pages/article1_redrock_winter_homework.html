@@ -36,6 +36,44 @@
                                     <li><a href = "https://github.com/shx-2020/homework-2021-wv" class = "button small">进入</a></li>
                                 </ul>
 								<p>状态：未完工</p>
+								<h2>日志</h2>
+								<hr />
+								<h3>2021年2月10日</h3>
+								<p>
+									无意之中搞出了很方便（可以直接复制粘贴）的顶部工具栏，我悟了<br>
+									方法：只需要创建一个顶部工具栏的布局xml，给它的按钮和标题都添加上id，然后在每个活动的布局中用\include\>标签添加这个工具栏布局，
+									在活动中新建一个方法（initTopViewBar()方法），在方法中便可以分别设置它的各个按钮的功能和标题的文字。<br>
+									附上这个方法的代码示例：
+									<pre><code>
+private void initTopBarViews(String title, int tarLayoutId){
+        Activity thisActivity = this;
+        TextView titleTv;
+        titleTv = findViewById(tarLayoutId).findViewById(R.id.top_view_bar_title);
+        titleTv.setText(title);
+        StatusBarUtils.setWindowStatusBarColor(this,R.color.orange_for_top_view_bar);
+        Button btnBack = findViewById(tarLayoutId).findViewById(R.id.top_view_bar_back_button);
+        TextView tvRefresh = findViewById(tarLayoutId).findViewById(R.id.top_view_bar_refresh);
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                thisActivity.finish();
+            }
+        });
+        tvRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        //刷新方法
+                    }
+                }.run();
+                Toast.makeText(thisActivity,"已刷新",Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+									</code></pre>
+								</p>
 							</section>
 
 					</div>
