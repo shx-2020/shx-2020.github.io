@@ -41,7 +41,7 @@
 								<h3>2021年2月10日</h3>
 								<p>
 									无意之中搞出了很方便（可以直接复制粘贴）的顶部工具栏，我悟了<br>
-									方法：只需要创建一个顶部工具栏的布局xml，给它的按钮和标题都添加上id，然后在每个活动的布局中用\include\>标签添加这个工具栏布局，
+									方法：只需要创建一个顶部工具栏的布局xml，给它的按钮和标题都添加上id，然后在每个活动的布局中用&lt;include&gt;标签添加这个工具栏布局，
 									在活动中新建一个方法（initTopViewBar()方法），在方法中便可以分别设置它的各个按钮的功能和标题的文字。<br>
 									附上这个方法的代码示例：
 									<pre><code>
@@ -73,6 +73,30 @@ private void initTopBarViews(String title, int tarLayoutId){
         });
     }
 									</code></pre>
+								</p>
+								<h3>2021年2月13日</h3>
+								<h4>向活动传递任意形式数据的方法</h4>
+								<p>
+									将任意类型Obj数据obj写入一个HashMap&lt;String, Obj&gt;类型的map对象，例如：
+									<pre><code>
+HashMap map = new HashMap&lt;Stirng, Obj&gt;;
+map.put("data", obj);
+									</code></pre>
+									然后用Bundle类型对象bundle存放map，并且用putExtras传递这个bundle，bundle传入intent，开始活动例如：
+									<pre><code>
+Bundle bundle = new Bundle();
+bundle.putSerializable("serializable",map);
+Intent intent = new Intent(FirstActivity.this,SecondActivity.class);
+intent.putExtras(bundle);
+startActivity(intent);
+									</code></pre>
+									在目标活动中将bundle解得hashMap，再解得Obj类型数据objInSecondAct，例如：
+									<pre><code>
+Bundle bundle = getIntent().getExtras();
+HashMap&lt;String,DecodedLoginData&gt; map = (HashMap&lt;String,Obj&gt;)bundle.getSerializable("serializable");
+obj = map.get("data");
+									</code></pre>
+									这样就能获得等价于之前obj的objInSecondAct了
 								</p>
 							</section>
 
